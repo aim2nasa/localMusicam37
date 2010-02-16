@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtwolame_static", "libtwolame_static\libtwolame_static.vcproj", "{D461DBA2-84A7-4767-98EB-4BCAC60DAF99}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "twolame", "twolame.vcproj", "{79A0A258-1F3D-450B-9445-906C3328216F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D461DBA2-84A7-4767-98EB-4BCAC60DAF99} = {D461DBA2-84A7-4767-98EB-4BCAC60DAF99}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
+		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D461DBA2-84A7-4767-98EB-4BCAC60DAF99}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D461DBA2-84A7-4767-98EB-4BCAC60DAF99}.Debug|Win32.Build.0 = Debug|Win32
+		{D461DBA2-84A7-4767-98EB-4BCAC60DAF99}.Release|Win32.ActiveCfg = Release|Win32
+		{D461DBA2-84A7-4767-98EB-4BCAC60DAF99}.Release|Win32.Build.0 = Release|Win32
+		{79A0A258-1F3D-450B-9445-906C3328216F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{79A0A258-1F3D-450B-9445-906C3328216F}.Debug|Win32.Build.0 = Debug|Win32
+		{79A0A258-1F3D-450B-9445-906C3328216F}.Release|Win32.ActiveCfg = Release|Win32
+		{79A0A258-1F3D-450B-9445-906C3328216F}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
