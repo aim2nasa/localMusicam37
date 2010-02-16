@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtwolame_dll", "twolame-0.3.12-MOD\win32\libtwolame_dll.vcproj", "{DFB06356-061D-4EAD-82F5-4696149B6F01}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmp2_dll", "libmp2_dll\libmp2_dll.vcproj", "{BF538CB5-8A5E-40C5-926A-AD8D002C06F0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mp2Encoder", "mp2Encoder\mp2Encoder.vcproj", "{C3701EA2-3AE0-4138-BFF2-FB624EEADBA8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DFB06356-061D-4EAD-82F5-4696149B6F01} = {DFB06356-061D-4EAD-82F5-4696149B6F01}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mp2Decoder", "mp2Decoder\mp2Decoder.vcproj", "{12DEE264-56A8-44C1-A3D8-F7D27A3BB8A2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BF538CB5-8A5E-40C5-926A-AD8D002C06F0} = {BF538CB5-8A5E-40C5-926A-AD8D002C06F0}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtwolame_static", "twolame-0.3.12-MOD\win32\libtwolame_static.vcproj", "{8C69F7B6-684F-48D9-9057-8912CA3DAA8B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "twolame", "twolame-0.3.12-MOD\win32\twolame.vcproj", "{79A0A258-1F3D-450B-9445-906C3328216F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8C69F7B6-684F-48D9-9057-8912CA3DAA8B} = {8C69F7B6-684F-48D9-9057-8912CA3DAA8B}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
+		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DFB06356-061D-4EAD-82F5-4696149B6F01}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DFB06356-061D-4EAD-82F5-4696149B6F01}.Debug|Win32.Build.0 = Debug|Win32
+		{DFB06356-061D-4EAD-82F5-4696149B6F01}.Release|Win32.ActiveCfg = Release|Win32
+		{DFB06356-061D-4EAD-82F5-4696149B6F01}.Release|Win32.Build.0 = Release|Win32
+		{BF538CB5-8A5E-40C5-926A-AD8D002C06F0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BF538CB5-8A5E-40C5-926A-AD8D002C06F0}.Debug|Win32.Build.0 = Debug|Win32
+		{BF538CB5-8A5E-40C5-926A-AD8D002C06F0}.Release|Win32.ActiveCfg = Release|Win32
+		{BF538CB5-8A5E-40C5-926A-AD8D002C06F0}.Release|Win32.Build.0 = Release|Win32
+		{C3701EA2-3AE0-4138-BFF2-FB624EEADBA8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C3701EA2-3AE0-4138-BFF2-FB624EEADBA8}.Debug|Win32.Build.0 = Debug|Win32
+		{C3701EA2-3AE0-4138-BFF2-FB624EEADBA8}.Release|Win32.ActiveCfg = Release|Win32
+		{C3701EA2-3AE0-4138-BFF2-FB624EEADBA8}.Release|Win32.Build.0 = Release|Win32
+		{12DEE264-56A8-44C1-A3D8-F7D27A3BB8A2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{12DEE264-56A8-44C1-A3D8-F7D27A3BB8A2}.Debug|Win32.Build.0 = Debug|Win32
+		{12DEE264-56A8-44C1-A3D8-F7D27A3BB8A2}.Release|Win32.ActiveCfg = Release|Win32
+		{12DEE264-56A8-44C1-A3D8-F7D27A3BB8A2}.Release|Win32.Build.0 = Release|Win32
+		{8C69F7B6-684F-48D9-9057-8912CA3DAA8B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8C69F7B6-684F-48D9-9057-8912CA3DAA8B}.Debug|Win32.Build.0 = Debug|Win32
+		{8C69F7B6-684F-48D9-9057-8912CA3DAA8B}.Release|Win32.ActiveCfg = Release|Win32
+		{8C69F7B6-684F-48D9-9057-8912CA3DAA8B}.Release|Win32.Build.0 = Release|Win32
+		{79A0A258-1F3D-450B-9445-906C3328216F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{79A0A258-1F3D-450B-9445-906C3328216F}.Debug|Win32.Build.0 = Debug|Win32
+		{79A0A258-1F3D-450B-9445-906C3328216F}.Release|Win32.ActiveCfg = Release|Win32
+		{79A0A258-1F3D-450B-9445-906C3328216F}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
