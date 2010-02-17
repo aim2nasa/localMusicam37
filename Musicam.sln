@@ -22,6 +22,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "twolame", "twolame-0.3.12-M
 		{8C69F7B6-684F-48D9-9057-8912CA3DAA8B} = {8C69F7B6-684F-48D9-9057-8912CA3DAA8B}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mp2Changer", "mp2Changer\mp2Changer.vcproj", "{7B1662D3-A89A-4FDD-B728-82DD8DD5A310}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DFB06356-061D-4EAD-82F5-4696149B6F01} = {DFB06356-061D-4EAD-82F5-4696149B6F01}
+		{BF538CB5-8A5E-40C5-926A-AD8D002C06F0} = {BF538CB5-8A5E-40C5-926A-AD8D002C06F0}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
@@ -55,6 +61,10 @@ Global
 		{79A0A258-1F3D-450B-9445-906C3328216F}.Debug|Win32.Build.0 = Debug|Win32
 		{79A0A258-1F3D-450B-9445-906C3328216F}.Release|Win32.ActiveCfg = Release|Win32
 		{79A0A258-1F3D-450B-9445-906C3328216F}.Release|Win32.Build.0 = Release|Win32
+		{7B1662D3-A89A-4FDD-B728-82DD8DD5A310}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7B1662D3-A89A-4FDD-B728-82DD8DD5A310}.Debug|Win32.Build.0 = Debug|Win32
+		{7B1662D3-A89A-4FDD-B728-82DD8DD5A310}.Release|Win32.ActiveCfg = Release|Win32
+		{7B1662D3-A89A-4FDD-B728-82DD8DD5A310}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
