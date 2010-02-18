@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="mp2Encoder"
-	ProjectGUID="{C3701EA2-3AE0-4138-BFF2-FB624EEADBA8}"
-	RootNamespace="mp2Encoder"
+	Name="libmp2Changer_dll"
+	ProjectGUID="{A39B2794-3908-4223-B175-271A30E4D914}"
+	RootNamespace="libmp2Changer_dll"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="..\bin\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="..\bin\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			>
 			<Tool
@@ -40,8 +40,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../twolame-0.3.12-MOD/libtwolame"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="../libmp2_dll;&quot;../twolame-0.3.12-MOD/libtwolame&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBMP2CHANGER_DLL_EXPORTS;LIBTWOLAME_DLL_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,10 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\bin\$(PlatformName)\$(ConfigurationName)\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -96,7 +95,7 @@
 			Name="Release|Win32"
 			OutputDirectory="..\bin\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="..\bin\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -117,8 +116,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../twolame-0.3.12-MOD/libtwolame"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="../libmp2_dll;&quot;../twolame-0.3.12-MOD/libtwolame&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBMP2CHANGER_DLL_EXPORTS;LIBTWOLAME_DLL_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -136,10 +135,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\bin\$(PlatformName)\$(ConfigurationName)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -179,19 +177,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\twolame-0.3.12-MOD\frontend\audio.c"
-				>
-			</File>
-			<File
-				RelativePath="..\twolame-0.3.12-MOD\frontend\frontend.c"
-				>
-			</File>
-			<File
-				RelativePath="..\twolame-0.3.12-MOD\frontend\getopt.c"
-				>
-			</File>
-			<File
-				RelativePath="..\twolame-0.3.12-MOD\frontend\getopt1.c"
+				RelativePath=".\mp2Changer.c"
 				>
 			</File>
 		</Filter>
@@ -201,15 +187,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\twolame-0.3.12-MOD\frontend\audio.h"
-				>
-			</File>
-			<File
-				RelativePath="..\twolame-0.3.12-MOD\frontend\frontend.h"
-				>
-			</File>
-			<File
-				RelativePath="..\twolame-0.3.12-MOD\frontend\getopt_win.h"
+				RelativePath=".\mp2Changer.h"
 				>
 			</File>
 		</Filter>
