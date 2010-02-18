@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../libmp2_dll,../twolame-0.3.12-MOD/libtwolame"
+				AdditionalIncludeDirectories="../libmp2_dll;&quot;../twolame-0.3.12-MOD/libtwolame&quot;;../libmp2Changer_dll"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;LIBTWOLAME_DLL_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -118,7 +118,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../libmp2_dll,../twolame-0.3.12-MOD/libtwolame"
+				AdditionalIncludeDirectories="../libmp2_dll;&quot;../twolame-0.3.12-MOD/libtwolame&quot;;../libmp2Changer_dll"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;LIBTWOLAME_DLL_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
