@@ -9,7 +9,7 @@
 
 static char errMsg[256];
 static const int bitrateTable[2][15]={
-	{8,16,24,32,40,48,56,64,80,96,112,128,144,160},			//for 24KHz
+	{0,8,16,24,32,40,48,56,64,80,96,112,128,144,160},			//for 24KHz
 	{0,32,48,56,64,80,96,112,128,160,192,224,256,320,384}	//for 48KHz
 };
 
@@ -97,4 +97,9 @@ void mp2c_close(mp2Changer* chg)
 const char* mp2c_getLastError()
 {
 	return errMsg;
+}
+
+int mp2c_getBitrate(int nId,int nBitrateIdx)
+{
+	return getBitrate(nId,nBitrateIdx);
 }

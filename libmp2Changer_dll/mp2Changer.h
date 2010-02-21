@@ -42,6 +42,7 @@ DLL_EXPORT int mp2c_bitrate(mp2Changer* chg);
 DLL_EXPORT int mp2c_encode(mp2Changer* chg,const unsigned char* frame,int numSampleCh,unsigned char* mp2Buffer,int mp2BufferSize);
 DLL_EXPORT void mp2c_close(mp2Changer* chg);
 DLL_EXPORT const char* mp2c_getLastError();
+DLL_EXPORT int mp2c_getBitrate(int nId,int nBitrateIdx);
 
 #ifdef __cplusplus
 }
