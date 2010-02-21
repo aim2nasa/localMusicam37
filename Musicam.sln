@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmp2Changer_dll", "libmp2
 		{BF538CB5-8A5E-40C5-926A-AD8D002C06F0} = {BF538CB5-8A5E-40C5-926A-AD8D002C06F0}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mpg123DecoderTest", "mpg123DecoderTest\mpg123DecoderTest.vcproj", "{0CBF096F-DB66-44D7-AF9B-986C783262D9}"
+EndProject
 Global
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
@@ -76,6 +78,10 @@ Global
 		{A39B2794-3908-4223-B175-271A30E4D914}.Debug|Win32.Build.0 = Debug|Win32
 		{A39B2794-3908-4223-B175-271A30E4D914}.Release|Win32.ActiveCfg = Release|Win32
 		{A39B2794-3908-4223-B175-271A30E4D914}.Release|Win32.Build.0 = Release|Win32
+		{0CBF096F-DB66-44D7-AF9B-986C783262D9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0CBF096F-DB66-44D7-AF9B-986C783262D9}.Debug|Win32.Build.0 = Debug|Win32
+		{0CBF096F-DB66-44D7-AF9B-986C783262D9}.Release|Win32.ActiveCfg = Release|Win32
+		{0CBF096F-DB66-44D7-AF9B-986C783262D9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
