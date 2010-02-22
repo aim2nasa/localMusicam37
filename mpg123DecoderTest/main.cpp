@@ -2,8 +2,6 @@
 #include <assert.h>
 #include <mpg123.h>
 
-#define INPUT_FILE			"..//contents//streamList_subCh(7).mp2"
-#define OUTPUT_FILE			"..//output//streamList_subCh(7).pcm"
 #define INBUFF  16384
 #define OUTBUFF 32768 
 
@@ -62,19 +60,27 @@ void cleanup(mpg123_handle* m=NULL)
 	mpg123_exit();
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+	if (argc!=3) {
+		cout<<"Usage: mpg123DecoderTest <input.mp2> <output.pcm>"<<endl;
+		return -1;
+	}
+
+	cout<<"Input file: "<<argv[1]<<endl;
+	cout<<"Output file: "<<argv[2]<<endl;
+
 	if(mpg123_init()!=MPG123_OK) { cout<<"mpg123_init() failed"; cleanup(); return -1; }
 
 	FILE *inpStream,*outStream;
 	errno_t err;
-	if( (err  = fopen_s( &inpStream,INPUT_FILE,"rb" )) !=0 ) {
-		cout<<INPUT_FILE<<" open failure"<<endl;
+	if( (err  = fopen_s( &inpStream,argv[1],"rb" )) !=0 ) {
+		cout<<argv[1]<<" open failure"<<endl;
 		cleanup();
 		return -1;
 	}
-	if( (err  = fopen_s( &outStream,OUTPUT_FILE,"wb" )) !=0 ) {
-		cout<<OUTPUT_FILE<<" open failure"<<endl;
+	if( (err  = fopen_s( &outStream,argv[2],"wb" )) !=0 ) {
+		cout<<argv[2]<<" open failure"<<endl;
 		return -1;
 	}
 
