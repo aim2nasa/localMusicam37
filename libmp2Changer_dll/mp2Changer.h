@@ -8,7 +8,9 @@ extern "C" {
 #include <kjmp2.h>
 #include <twolame.h>
 
+#ifndef DLL_EXPORT
 #define DLL_EXPORT __declspec(dllexport)
+#endif
 
 #pragma pack(push, 1)
 typedef struct{
