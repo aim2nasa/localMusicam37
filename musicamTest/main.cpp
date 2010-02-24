@@ -2,8 +2,6 @@
 #include <assert.h>
 #include <musicam.h>
 
-#define INPUT_FILE			"..//contents//streamList_subCh(7).mp2"
-#define OUTMP2_FILE			"..//output//new_streamList_subCh(7).mp2"
 #define MAX_SAMPLE_SIZE		(1152)
 #define MP2_BUF_SIZE		(16384)
 
@@ -11,6 +9,8 @@ static const int bitrateTable[2][15]={
 	{0,8,16,24,32,40,48,56,64,80,96,112,128,144,160},		//for 24KHz
 	{0,32,48,56,64,80,96,112,128,160,192,224,256,320,384}	//for 48KHz
 };
+
+using namespace std;
 
 void parseMp2Header(MP2_HEADER* pHeader,unsigned char* pBuffer)
 {
@@ -36,46 +36,57 @@ static int getBitrate(int nId,int nBitrateIdx)
 	return 1000*bitrateTable[nId][nBitrateIdx];	//kbps unit
 }
 
-using namespace std;
-
-void main(int argc,int *argv[])
+int getSamplingFrequency(int id)
 {
-	mc* m = mc_init();
+	assert(id==0||id==1);
+	if(id==1) { return 48000; }else{ return 24000; }
+}
 
-	//Decode
-	FILE *inpStream,*mp2OutStream;
-	errno_t err;
-	if( (err  = fopen_s( &inpStream,INPUT_FILE,"rb" )) !=0 ) {
-		cout<<INPUT_FILE<<" open failure"<<endl;
-		return;
-	}
-	if( (err  = fopen_s( &mp2OutStream,OUTMP2_FILE,"wb" )) !=0 ) {
-		cout<<OUTMP2_FILE<<" open failure"<<endl;
-		return;
-	}
-
-	twolame_options* encopts = m->opt;
-
-	TWOLAME_MPEG_version ver = TWOLAME_MPEG1;
-	int nSrcNumCh = 2;
-	int nSrcSampleFreq;
-	(ver==TWOLAME_MPEG1)?nSrcSampleFreq=48000:nSrcSampleFreq=24000;
-	int nDstBitrate = 384;
-
-	twolame_set_version(encopts,TWOLAME_MPEG1);
+int initTwolameOption(twolame_options* encopts,MP2_HEADER* header,int nDstBitrate)
+{
+	twolame_set_version(encopts,(header->id==1)?TWOLAME_MPEG1:TWOLAME_MPEG2);
 	twolame_set_rawmode(encopts, 1);
-	twolame_set_num_channels(encopts,nSrcNumCh);
-	twolame_set_in_samplerate(encopts,nSrcSampleFreq);
-	twolame_set_out_samplerate(encopts,nSrcSampleFreq);
+	twolame_set_num_channels(encopts,(header->mode==0x3)?1:2);
+	twolame_set_in_samplerate(encopts,getSamplingFrequency(header->id));
+	twolame_set_out_samplerate(encopts,getSamplingFrequency(header->id));
 	twolame_set_mode(encopts,TWOLAME_STEREO);
 	twolame_set_bitrate(encopts,nDstBitrate);
 	twolame_set_error_protection(encopts,TRUE);
 
 	if(twolame_init_params(encopts)!=0) {
 		cout<<"Error: configuring libtwolame encoder failed"<<endl;
+		return -1;
+	}
+
+	cout<<"Input file bitrate: "<<getBitrate(header->id,header->bitrateIdx)/1000<<"kbps"<<endl;
+	twolame_print_config(encopts);
+	return 0;
+}
+
+void main(int argc, char *argv[])
+{
+	if (argc!=4) {
+		cout<<"Usage: musicamTest <input.mp2> <output.mp2> <output bitrate>"<<endl;
 		return;
 	}
-	twolame_print_config(encopts);
+
+	cout<<"Input file: "<<argv[1]<<endl;
+	cout<<"Output file: "<<argv[2]<<endl;
+	cout<<"Desired Output Bitrate:"<<argv[3]<<"kbps"<<endl;
+
+	mc* m = mc_init();
+
+	//Decode
+	FILE *inpStream,*mp2OutStream;
+	errno_t err;
+	if( (err  = fopen_s( &inpStream,argv[1],"rb" )) !=0 ) {
+		cout<<argv[1]<<" open failure"<<endl;
+		return;
+	}
+	if( (err  = fopen_s( &mp2OutStream,argv[2],"wb" )) !=0 ) {
+		cout<<argv[2]<<" open failure"<<endl;
+		return;
+	}
 
 	unsigned char buffer[MAX_SAMPLE_SIZE];
 	memset(buffer,0x0,sizeof(buffer));
@@ -87,21 +98,31 @@ void main(int argc,int *argv[])
 		size_t nRead = fread(buffer,sizeof(unsigned char),4,inpStream);	//read header only
 		parseMp2Header(&header,buffer);
 
-		int nSrcBufferSize = 144*getBitrate(header.id,header.bitrateIdx)/((header.id)?48000:24000);
+		if(nFrameCount==0) {
+			if(initTwolameOption(m->opt,&header,atoi(argv[3]))!=0) {
+				cout<<"initTwolameOption() failed"<<endl;
+				break;
+			}
+		}
+
+		int nSrcBufferSize = 144*getBitrate(header.id,header.bitrateIdx)/getSamplingFrequency(header.id);
 		nRead = fread(buffer+4,sizeof(unsigned char),nSrcBufferSize-4,inpStream);	//read rest of the frame
 		if(nRead) assert(nRead==(nSrcBufferSize-4));
 
-		int nEncRtn = mc_encode(m,buffer,nSrcBufferSize,MAX_SAMPLE_SIZE,mp2Buffer,sizeof(mp2Buffer));
+		int nEncRtn = mc_encode(m,buffer,nSrcBufferSize,MAX_SAMPLE_SIZE,mp2Buffer);
 		if(nEncRtn<0) {
 			cout<<"encode error:"<<mc_getLastError()<<endl;
 			break;
 		}
-		size_t nWrite = fwrite(mp2Buffer,sizeof(unsigned char),nEncRtn,mp2OutStream);
-		assert(nWrite==nEncRtn);
+		if(nEncRtn>0) {
+			size_t nWrite = fwrite(mp2Buffer,sizeof(unsigned char),nEncRtn,mp2OutStream);
+			assert(nWrite==nEncRtn);
+		}
 
 		fprintf(stderr, "[%04i", ++nFrameCount);
 		fprintf(stderr, "]\r");
 		fflush(stderr);
+
 	}
 	fclose(mp2OutStream);
 	fclose(inpStream);

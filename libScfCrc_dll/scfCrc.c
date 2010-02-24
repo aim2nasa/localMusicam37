@@ -405,25 +405,24 @@ int scfCrc_getCrc(const unsigned char* inFrame,int inFrameSize,unsigned char crc
 	return nCrc;
 }
 
-int scfCrc_apply(scfCrc* sc,unsigned char* inFrame,int inFrameSize,unsigned char* outFrame,int outFrameSize)
+int scfCrc_apply(scfCrc* sc,unsigned char* inFrame,int inFrameSize,unsigned char* outFrame)
 {
 	int nCrc=0;
 	unsigned char crc[MAX_SCF_CRC_SIZE];
 
 	if(sc==0||inFrame==0||inFrameSize==0||outFrame==0) return -1;
-	if(inFrameSize!=outFrameSize) return -1;
 
 	nCrc = scfCrc_getCrc(inFrame,inFrameSize,crc);
 	if(nCrc==-1) return -1;
 
-	memcpy(sc->buffer[next(sc->index)],inFrame,outFrameSize);	//다음 프레임을 미리 준비
+	memcpy(sc->buffer[next(sc->index)],inFrame,inFrameSize);	//다음 프레임을 미리 준비
 
 	if(sc->frameCount==0) {
 		nCrc=0;	//맨 처음 프레임인 경우 다음 프레임의 CRC를 담을수 없기때문에
 	}else{
 		memset(sc->buffer[sc->index]+inFrameSize-nCrc-2,0,nCrc+2);
 		memcpy(sc->buffer[sc->index]+inFrameSize-nCrc-2,crc+4-nCrc,nCrc);
-		memcpy(outFrame,sc->buffer[sc->index],outFrameSize);
+		memcpy(outFrame,sc->buffer[sc->index],inFrameSize);
 	}
 	sc->frameCount++;
 	sc->index = next(sc->index);
