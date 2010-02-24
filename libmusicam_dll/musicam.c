@@ -5,6 +5,8 @@
 
 #define MAX_ERROR_MSG	256
 #define PCM_BUF_SIZE	(1152*4)
+#define INBUFF  16384
+#define OUTBUFF 32768 
 
 static char errMsg[MAX_ERROR_MSG];
 
@@ -24,6 +26,7 @@ mc* mc_init()
 	if(mpg123_open_feed(m->mpg)!=MPG123_OK) { mpg123_delete(m->mpg); mpg123_exit(); return 0; }
 
 	m->opt = twolame_init();
+	m->sc = scfCrc_init();
 	return m;
 }
 
@@ -33,21 +36,34 @@ void mc_close(mc* m)
 	mpg123_delete(m->mpg);
 	mpg123_exit();
 	twolame_close(&m->opt);
+	scfCrc_close(m->sc);
 	free(m);
 }
 
-int mc_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,int numSampleCh,unsigned char* outMucframe,int outMucframeSize)
+int mc_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,int numSampleCh,unsigned char* outMucframe)
 {
 	unsigned long nRtn;
-	int nSize;
+	int nSize,nCrc;
 	size_t size = 0;
 	short pcm[PCM_BUF_SIZE];
+	unsigned char tmpBuffer[OUTBUFF];
 
 	memset(errMsg,0,sizeof(errMsg));
 	nRtn = mpg123_decode(m->mpg,inMp2frame,inMp2frameSize,(unsigned char*)pcm,PCM_BUF_SIZE,&size);
 
-	nSize = twolame_encode_buffer_interleaved(m->opt,pcm,numSampleCh,outMucframe,outMucframeSize);
-	if(nSize<0) sprintf_s(errMsg,sizeof(errMsg),"twolame_encode_buffer_interleaved() return %d",nSize);
+	nSize = twolame_encode_buffer_interleaved(m->opt,pcm,numSampleCh,tmpBuffer,OUTBUFF);
+	if(nSize<0) {
+		sprintf_s(errMsg,sizeof(errMsg),"twolame_encode_buffer_interleaved() return %d",nSize);
+		return -1;
+	}
+
+	nCrc = scfCrc_apply(m->sc,tmpBuffer,nSize,outMucframe);
+	if(nCrc<0) {
+		sprintf_s(errMsg,sizeof(errMsg),"scfCrc_apply() return %d",nCrc);
+		return -1;
+	}else if(nCrc==0) {
+		return 0;
+	}
 	return nSize;
 }
 
