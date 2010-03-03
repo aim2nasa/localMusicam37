@@ -109,17 +109,18 @@ void main(int argc, char *argv[])
 		nRead = fread(buffer+4,sizeof(unsigned char),nSrcBufferSize-4,inpStream);	//read rest of the frame
 		if(nRead) assert(nRead==(nSrcBufferSize-4));
 
-		int nEncRtn = mc_encode(m,buffer,nSrcBufferSize,MAX_SAMPLE_SIZE,mp2Buffer);
+		nFrameCount++;
+		int nEncRtn = mc_mp2_mp2_encode(m,buffer,nSrcBufferSize,MAX_SAMPLE_SIZE,mp2Buffer);
 		if(nEncRtn<0) {
 			cout<<"encode error:"<<mc_getLastError()<<endl;
-			break;
+			continue;
 		}
 		if(nEncRtn>0) {
 			size_t nWrite = fwrite(mp2Buffer,sizeof(unsigned char),nEncRtn,mp2OutStream);
 			assert(nWrite==nEncRtn);
 		}
 
-		fprintf(stderr, "[%04i", ++nFrameCount);
+		fprintf(stderr, "[%04i", nFrameCount);
 		fprintf(stderr, "]\r");
 		fflush(stderr);
 
