@@ -40,7 +40,8 @@ extern "C" {
 
 	MUSICAM_DLL_EXPORT mc* mc_init();
 	MUSICAM_DLL_EXPORT void mc_close(mc* m);
-	MUSICAM_DLL_EXPORT int mc_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,int numSampleCh,unsigned char* outMucframe);
+	MUSICAM_DLL_EXPORT int mc_pcm_mp2_encode(mc* m,const unsigned char* pcmFrame,int pcmFrameSize,int numSampleCh,unsigned char* outMucframe);
+	MUSICAM_DLL_EXPORT int mc_mp2_mp2_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,int numSampleCh,unsigned char* outMucframe);
 	MUSICAM_DLL_EXPORT const char* mc_getLastError();
 
 #ifdef __cplusplus

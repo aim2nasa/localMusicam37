@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include <assert.h>
 #include <memory.h>
+#include <stdio.h>
 
 #define ID_ISO13818			0
 #define ID_ISO11172			1
@@ -16,6 +17,7 @@
 #define SCFSI_BIT_SIZE		2
 #define SCF_BIT_SIZE		6
 #define CRC8_POLY			0x1D
+#define MAX_ERROR_MSG		256
 
 typedef unsigned char 		__u8;
 typedef unsigned short		__u16;
@@ -38,6 +40,9 @@ typedef struct{
 	unsigned short emphasis:2;
 }MP2_HEADER;
 #pragma pack(pop)
+
+
+static char errMsg[MAX_ERROR_MSG];
 
 static const int bitrateTable[2][15]={
 	{0,8,16,24,32,40,48,56,64,80,96,112,128,144,160},		//for 24KHz
@@ -166,9 +171,19 @@ int scfCrc_getCrc(const unsigned char* inFrame,int inFrameSize,unsigned char crc
 	unsigned short i, j, k;
 	int nCrc = 0;
 
-	if(inFrame==0||inFrameSize==0) return -1;
-	if((inFrame[0]!=0xFF)||((inFrame[1]&0xF0)!=0xF0)) return -1;	//syncword check
-	if(inFrameSize>MAX_FRAME_SIZE) return -1;
+	memset(errMsg,0,sizeof(errMsg));
+
+	if(inFrame==0||inFrameSize==0) {
+		sprintf_s(errMsg,sizeof(errMsg),"scfCrc_getCrc(),inFrame=0x%p,inFrameSize=%d",inFrame,inFrameSize); return -1;
+	}
+
+	if((inFrame[0]!=0xFF)||((inFrame[1]&0xF0)!=0xF0)) {
+		sprintf_s(errMsg,sizeof(errMsg),"scfCrc_getCrc(),inFrame[0]=%d,inFrame[1]=%d",inFrame[0],inFrame[1]); return -1; 
+	}
+
+	if(inFrameSize>MAX_FRAME_SIZE) {
+		sprintf_s(errMsg,sizeof(errMsg),"scfCrc_getCrc(),inFrameSize=%d,MAX_FRAME_SIZE=%d",inFrameSize,MAX_FRAME_SIZE); return -1;
+	}
 	ptr+=2;
 
 	parseMp2Header(&header,inFrame);
@@ -199,7 +214,9 @@ int scfCrc_getCrc(const unsigned char* inFrame,int inFrameSize,unsigned char crc
 	}			
 
 	frame_size = 144*bit_rate/sample_freq;
-	if(frame_size!=inFrameSize) return -1;
+	if(frame_size!=inFrameSize) {
+		sprintf_s(errMsg,sizeof(errMsg),"scfCrc_getCrc(),frame_size=%d,inFrameSize=%d",frame_size,inFrameSize); return -1;
+	}
 
 	// CRC read
 	if(header.protect==CRC_ENABLE) ptr += 2;
@@ -410,7 +427,11 @@ int scfCrc_apply(scfCrc* sc,unsigned char* inFrame,int inFrameSize,unsigned char
 	int nCrc=0;
 	unsigned char crc[MAX_SCF_CRC_SIZE];
 
-	if(sc==0||inFrame==0||inFrameSize==0||outFrame==0) return -1;
+	memset(errMsg,0,sizeof(errMsg));
+
+	if(sc==0||inFrame==0||inFrameSize==0||outFrame==0) {
+		sprintf_s(errMsg,sizeof(errMsg),"scfCrc_apply(),sc=0x%p,inFrame=0x%p,inFrameSize=%d,outFrame=0x%p",sc,inFrame,inFrameSize,outFrame); return -1;
+	}
 
 	nCrc = scfCrc_getCrc(inFrame,inFrameSize,crc);
 	if(nCrc==-1) return -1;
@@ -427,4 +448,9 @@ int scfCrc_apply(scfCrc* sc,unsigned char* inFrame,int inFrameSize,unsigned char
 	sc->frameCount++;
 	sc->index = next(sc->index);
 	return nCrc;
+}
+
+const char* scfCrc_getLastError()
+{
+	return errMsg;
 }

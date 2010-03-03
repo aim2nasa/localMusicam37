@@ -40,18 +40,16 @@ void mc_close(mc* m)
 	free(m);
 }
 
-int mc_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,int numSampleCh,unsigned char* outMucframe)
+int mc_pcm_mp2_encode(mc* m,const unsigned char* pcmFrame,int pcmFrameSize,int numSampleCh,unsigned char* outMucframe)
 {
 	unsigned long nRtn;
 	int nSize,nCrc;
 	size_t size = 0;
-	short pcm[PCM_BUF_SIZE];
 	unsigned char tmpBuffer[OUTBUFF];
 
 	memset(errMsg,0,sizeof(errMsg));
-	nRtn = mpg123_decode(m->mpg,inMp2frame,inMp2frameSize,(unsigned char*)pcm,PCM_BUF_SIZE,&size);
 
-	nSize = twolame_encode_buffer_interleaved(m->opt,pcm,numSampleCh,tmpBuffer,OUTBUFF);
+	nSize = twolame_encode_buffer_interleaved(m->opt,pcmFrame,numSampleCh,tmpBuffer,OUTBUFF);
 	if(nSize<0) {
 		sprintf_s(errMsg,sizeof(errMsg),"twolame_encode_buffer_interleaved() return %d",nSize);
 		return -1;
@@ -65,6 +63,21 @@ int mc_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,int numSa
 		return 0;
 	}
 	return nSize;
+}
+
+int mc_mp2_mp2_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,int numSampleCh,unsigned char* outMucframe)
+{
+	unsigned long nRtn;
+	int nSize,nCrc;
+	size_t size = 0;
+	short pcm[PCM_BUF_SIZE];
+	unsigned char tmpBuffer[OUTBUFF];
+
+	memset(errMsg,0,sizeof(errMsg));
+	nRtn = mpg123_decode(m->mpg,inMp2frame,inMp2frameSize,(unsigned char*)pcm,PCM_BUF_SIZE,&size);
+	if(nRtn!=0) { sprintf_s(errMsg,sizeof(errMsg),"mpg123_decode() return %d",nRtn); return -1; }
+
+	return mc_pcm_mp2_encode(m,(unsigned char*)pcm,PCM_BUF_SIZE,numSampleCh,outMucframe);
 }
 
 const char* mc_getLastError()
