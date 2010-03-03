@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 		nRead = fread(inpBuffer+4,sizeof(unsigned char),nSrcBufferSize-4,inpStream);	//read rest of the frame
 		if(nRead&&(nRead!=(nSrcBufferSize-4))) break;
 
-		int nRtn = scfCrc_apply(sc,inpBuffer,nSrcBufferSize,outBuffer,nSrcBufferSize);
+		int nRtn = scfCrc_apply(sc,inpBuffer,nSrcBufferSize,outBuffer);
 		if(nRtn>0) fwrite(outBuffer,sizeof(unsigned char),nSrcBufferSize,outStream);
 
 		cout<<"frameCount="<<nFrameCount<<endl;
