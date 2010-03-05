@@ -149,3 +149,8 @@ int mc_encodeOption(twolame_options* encopts,HEADER_ID id,int nDstBitrate,TWOLAM
 	if(verbose) twolame_print_config(encopts);
 	return 0;
 }
+
+int mc_computeBitrate(int nFrameSize,int nSampleFreq)
+{
+	return nFrameSize*nSampleFreq/144;
+}

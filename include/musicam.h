@@ -11,9 +11,9 @@
 extern "C" {
 #endif
 
-#include <mpg123.h>
-#include <twolame.h>
-#include <scfCrc.h>
+#include "mpg123.h"
+#include "twolame.h"
+#include "scfCrc.h"
 
 #ifndef MUSICAM_DLL_EXPORT
 #define MUSICAM_DLL_EXPORT __declspec(dllexport)
@@ -127,6 +127,14 @@ extern "C" {
 	*	\return					0 successful otherwise -1
 	*/
 	MUSICAM_DLL_EXPORT int mc_encodeOption(twolame_options* encopts,HEADER_ID id,int nDstBitrate,TWOLAME_MPEG_mode mpegMode,int verbose);
+
+	/** calculate bitrate using frame size and sample frequency
+	*	
+	*	\param nFrameSize		frame size (subchannel)
+	*	\param nSampleFreq		sampling frequency
+	*	\return					calculated bitrare
+	*/
+	MUSICAM_DLL_EXPORT int mc_computeBitrate(int nFrameSize,int nSampleFreq);
 
 #ifdef __cplusplus
 }
