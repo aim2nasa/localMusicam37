@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="twolame"
 	ProjectGUID="{79A0A258-1F3D-450B-9445-906C3328216F}"
+	RootNamespace="twolame"
 	>
 	<Platforms>
 		<Platform
@@ -44,8 +45,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="../libtwolame"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;inline=__inline;LIBTWOLAME_STATIC;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="../../include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;inline=__inline;LIBTWOLAME_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -136,8 +137,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../libtwolame"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;inline=__inline;LIBTWOLAME_STATIC;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="../../include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;inline=__inline;LIBTWOLAME_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
