@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../libmp2_dll;&quot;../twolame-0.3.12-MOD/libtwolame&quot;"
+				AdditionalIncludeDirectories="../include;&quot;../twolame-0.3.12-MOD/libtwolame&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBMP2CHANGER_DLL_EXPORTS;LIBTWOLAME_DLL_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -116,7 +116,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../libmp2_dll;&quot;../twolame-0.3.12-MOD/libtwolame&quot;"
+				AdditionalIncludeDirectories="../include;&quot;../twolame-0.3.12-MOD/libtwolame&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBMP2CHANGER_DLL_EXPORTS;LIBTWOLAME_DLL_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -186,10 +186,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\mp2Changer.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="리소스 파일"
