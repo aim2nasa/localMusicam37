@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 #define MAX_ERROR_MSG	256
-#define PCM_BUF_SIZE	(1152*4)
 #define INBUFF  16384
 #define OUTBUFF 32768 
 
@@ -32,6 +31,10 @@ mc* mc_init()
 
 	m->opt = twolame_init();
 	m->sc = scfCrc_init();
+
+	memset(m->convPcm,0,sizeof(m->convPcm));
+	m->iReadCount = 0;
+	m->offset = 0;
 	return m;
 }
 
@@ -64,25 +67,53 @@ int mc_pcm_mp2_encode(mc* m,const unsigned char* pcmFrame,int pcmFrameSize,int n
 	if(nCrc<0) {
 		sprintf_s(errMsg,sizeof(errMsg),"scfCrc_apply() return %d",nCrc);
 		return -1;
-	}else if(nCrc==0) {
-		return 0;
 	}
 	return nSize;
 }
 
 int mc_mp2_mp2_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,int numSampleCh,unsigned char* outMucframe)
 {
-	unsigned long nRtn;
+	int i,nRtn;
 	int nSize,nCrc;
 	size_t size = 0;
-	short pcm[PCM_BUF_SIZE];
-	unsigned char tmpBuffer[OUTBUFF];
+	unsigned char pcm[PCM_BUF_SIZE];
+	MP2_HEADER header;
+	TWOLAME_MPEG_version ver = twolame_get_version(m->opt);
 
 	memset(errMsg,0,sizeof(errMsg));
+
+	mc_parseMp2Header(&header,(unsigned char*)inMp2frame);
 	nRtn = mpg123_decode(m->mpg,inMp2frame,inMp2frameSize,(unsigned char*)pcm,PCM_BUF_SIZE,&size);
 	if(nRtn!=0) { sprintf_s(errMsg,sizeof(errMsg),"mpg123_decode() return %d",nRtn); return -1; }
 
-	return mc_pcm_mp2_encode(m,(unsigned char*)pcm,PCM_BUF_SIZE,numSampleCh,outMucframe);
+	if((TWOLAME_MPEG_version)header.id==TWOLAME_MPEG2 && ver==TWOLAME_MPEG1) {
+		nSize = mc_pcm24to48(pcm,m->convPcm,(int)size,(header.mode==3)?1:2);
+		if(nSize==-1) return -1;
+
+		nRtn = 0;
+		for(i=0;i<2;i++) 
+			nRtn+=mc_pcm_mp2_encode(m,m->convPcm+i*nSize/2,nSize/2,numSampleCh,outMucframe+nRtn);
+
+		return nRtn;
+	}else if((TWOLAME_MPEG_version)header.id==TWOLAME_MPEG1 && ver==TWOLAME_MPEG2) {
+		if(m->iReadCount==0){
+			nSize = mc_pcm48to24(pcm,m->convPcm,(int)size,(header.mode==3)?1:2);
+			if(nSize==-1) return -1;
+			m->offset = nSize;
+			m->iReadCount++;
+			return 0;
+		}else{
+			nSize = mc_pcm48to24(pcm,m->convPcm+m->offset,(int)size,(header.mode==3)?1:2);
+			if(nSize==-1) return -1;
+
+			nRtn=mc_pcm_mp2_encode(m,m->convPcm,m->offset+nSize,numSampleCh,outMucframe);
+			m->offset=0;
+			m->iReadCount=0;
+			return nRtn;
+		}
+	}else{
+		return mc_pcm_mp2_encode(m,pcm,(int)size,numSampleCh,outMucframe);
+	}
 }
 
 const char* mc_getLastError()
@@ -153,4 +184,42 @@ int mc_encodeOption(twolame_options* encopts,HEADER_ID id,int nDstBitrate,TWOLAM
 int mc_computeBitrate(int nFrameSize,int nSampleFreq)
 {
 	return nFrameSize*nSampleFreq/144;
+}
+
+int mc_pcm48to24(unsigned char *src, unsigned char *dst, int nSrclen, int nChannel)
+{
+	int i,loopcnt,nBytes=0;
+	int offset = sizeof(short)*nChannel;
+
+	if(nSrclen==0||nChannel==0||nSrclen%offset != 0) {
+		sprintf_s(errMsg,sizeof(errMsg),"wrong arguments mc_pcm48to24(0x%p,0x%p,%d,%d)",src,dst,nSrclen,nChannel);
+		return -1;
+	}
+
+	loopcnt = nSrclen / offset / 2;
+	for(i=0;i<loopcnt;i++) {
+		memcpy(&dst[i*offset], &src[i*offset*2], offset);
+		nBytes+=offset;
+	}
+	return nBytes;
+}
+
+int mc_pcm24to48(unsigned char *src, unsigned char *dst, int nSrclen, int nChannel)
+{
+	int i,j,loopcnt,nBytes=0;
+	int offset = sizeof(short)*nChannel;
+
+	if(nSrclen==0||nChannel==0||nSrclen%offset!= 0) {
+		sprintf_s(errMsg,sizeof(errMsg),"wrong arguments mc_pcm24to48(0x%p,0x%p,%d,%d)",src,dst,nSrclen,nChannel);
+		return -1;
+	}
+
+	loopcnt = nSrclen / offset;
+	for(i=0;i<loopcnt;i++) {
+		for(j=0; j<2; j++) {
+			memcpy(&dst[i*offset*2 + offset*j], &src[i*offset], offset);
+			nBytes+=offset;
+		}
+	}
+	return nBytes;
 }

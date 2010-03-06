@@ -38,12 +38,17 @@ extern "C" {
 	}MP2_HEADER;
 #pragma pack(pop)
 
+#define PCM_BUF_SIZE	(1152*4)
+
 	/** MUSICAM library context */
 	typedef struct _musicam_context {
-		MP2_HEADER*		 hdr;			/**< MPEG2 Audio frame header */
-		mpg123_handle*	 mpg;			/**< pointer to mpg123 library */
-		twolame_options* opt;			/**< pointer to twolame option */
-		scfCrc*			 sc;			/**< pointer to scale factor crc library */
+		MP2_HEADER*		 hdr;						/**< MPEG2 Audio frame header */
+		mpg123_handle*	 mpg;						/**< pointer to mpg123 library */
+		twolame_options* opt;						/**< pointer to twolame option */
+		scfCrc*			 sc;						/**< pointer to scale factor crc library */
+		int				 iReadCount;				/**< buffer read counter */
+		int				 offset;					/**< offset for buffer */
+		unsigned char	 convPcm[PCM_BUF_SIZE*2];	/**< converted pcm buffer */
 	} mc;
 
 	/** ID of MPEG2 Audio frame header */
@@ -73,7 +78,7 @@ extern "C" {
 	*	\param pcmFrameSize		size of pcm stream
 	*	\param numSampleCh		number of samples per channel
 	*	\param outMucframe		pointer to encoded output buffer
-	*	\return					0 successful otherwise -1
+	*	\return					return number of bytes encoded if successful otherwise -1
 	*/
 	MUSICAM_DLL_EXPORT int mc_pcm_mp2_encode(mc* m,const unsigned char* pcmFrame,int pcmFrameSize,int numSampleCh,unsigned char* outMucframe);
 
@@ -84,7 +89,9 @@ extern "C" {
 	*	\param inMp2frameSize	size of mp2 stream
 	*	\param numSampleCh		number of samples per channel
 	*	\param outMucframe		pointer to encoded output buffer
-	*	\return					0 successful otherwise -1
+	*	\return					return number of bytes when successful
+	*							return -1 if error occurred
+	*							return 0 if more bytes needed, note this is not a failure
 	*/
 	MUSICAM_DLL_EXPORT int mc_mp2_mp2_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,int numSampleCh,unsigned char* outMucframe);
 
@@ -135,6 +142,26 @@ extern "C" {
 	*	\return					calculated bitrare
 	*/
 	MUSICAM_DLL_EXPORT int mc_computeBitrate(int nFrameSize,int nSampleFreq);
+
+	/** convert 48KHz sampled pcm data to pcm of 24KHz
+	*	
+	*	\param src				pointer to source frame with sampling frequency of 48KHz
+	*	\param dst				pointer to output frame with sampling frequency of 24KHz
+	*	\param nSrcLen			length of source frame
+	*	\param nChannel			number of channels
+	*	\return					affected bytes in output frame or -1 for wrong arguments
+	*/
+	MUSICAM_DLL_EXPORT int mc_pcm48to24(unsigned char *src, unsigned char *dst, int nSrcLen, int nChannel);
+
+	/** convert 24KHz sampled pcm data to pcm of 48KHz
+	*	
+	*	\param src				pointer to source frame with sampling frequency of 24KHz
+	*	\param dst				pointer to output frame with sampling frequency of 48KHz
+	*	\param nSrcLen			length of source frame
+	*	\param nChannel			number of channels
+	*	\return					affected bytes in output frame or -1 for wrong arguments
+	*/
+	MUSICAM_DLL_EXPORT int mc_pcm24to48(unsigned char *src, unsigned char *dst, int nSrcLen, int nChannel);
 
 #ifdef __cplusplus
 }
