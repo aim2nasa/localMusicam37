@@ -11,7 +11,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory=""
-				CommandArguments="../contents/dab_48khz_stereo_128_streamList_subCh(1).mp2 ../output/dab_48khz_stereo_128_streamList_subCh(1)_scfcrc.mp2"
+				CommandArguments="../output/s_48khz_128k.mp2 ../output/s_48khz_128k_invalid_crc.mp2 384"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"
@@ -39,7 +39,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory=""
-				CommandArguments="../contents/stereo_24khz_80kbps_streamList_subCh(2).mp2 ../output/stereo_24khz_80kbps_streamList_subCh(2)_scf_crc.mp2"
+				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"
@@ -50,7 +50,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor="0"
+				DebuggerFlavor=""
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""

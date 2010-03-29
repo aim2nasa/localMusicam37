@@ -11,7 +11,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory=""
-				CommandArguments="../contents/streamList_subCh(7).mp2"
+				CommandArguments="../contents/dab_48khz_stereo_128_streamList_subCh(1).mp2"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"
