@@ -49,6 +49,9 @@ void main(int argc, char *argv[])
 			}
 		}
 
+		//각 프레임마다 크기가 다를 경우 호출한다
+		//twolame_set_num_ancillary_bits(m->opt,48);
+
 		int nSrcBufferSize = 144*mc_getBitrate(header.id,header.bitrateIdx)/mc_getSamplingFrequency(header.id);
 		nRead = fread(buffer+4,sizeof(unsigned char),nSrcBufferSize-4,inpStream);	//read rest of the frame
 		if(nRead) assert(nRead==(nSrcBufferSize-4));

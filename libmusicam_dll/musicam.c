@@ -173,6 +173,9 @@ int mc_encodeOption(twolame_options* encopts,HEADER_ID id,int nDstBitrate,TWOLAM
 	twolame_set_bitrate(encopts,nDstBitrate);
 	twolame_set_error_protection(encopts,TRUE);
 
+	//No X-PAD assumed
+	twolame_set_num_ancillary_bits(encopts,8*(2+(((twolame_get_bitrate(encopts)/twolame_get_num_channels(encopts))>=56)?4:2)));
+
 	if((nRtn=twolame_init_params(encopts))!=0) {
 		sprintf_s(errMsg,sizeof(errMsg),"configuring libtwolame encoder failed, return %d",nRtn); return -1;
 	}

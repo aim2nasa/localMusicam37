@@ -71,6 +71,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mp2_48to24_Test", "mp2_48to
 		{C82410C9-89A2-4ED2-96D8-03547BB9DA87} = {C82410C9-89A2-4ED2-96D8-03547BB9DA87}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InvalidCrcTest", "InvalidCrcTest\InvalidCrcTest.vcproj", "{C84639B1-F16A-41FC-A300-DEF9820D0B0F}"
+EndProject
 Global
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
@@ -140,6 +142,10 @@ Global
 		{442663A2-8A04-4ECA-A82D-0CC47ECF2B9C}.Debug|Win32.Build.0 = Debug|Win32
 		{442663A2-8A04-4ECA-A82D-0CC47ECF2B9C}.Release|Win32.ActiveCfg = Release|Win32
 		{442663A2-8A04-4ECA-A82D-0CC47ECF2B9C}.Release|Win32.Build.0 = Release|Win32
+		{C84639B1-F16A-41FC-A300-DEF9820D0B0F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C84639B1-F16A-41FC-A300-DEF9820D0B0F}.Debug|Win32.Build.0 = Debug|Win32
+		{C84639B1-F16A-41FC-A300-DEF9820D0B0F}.Release|Win32.ActiveCfg = Release|Win32
+		{C84639B1-F16A-41FC-A300-DEF9820D0B0F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
