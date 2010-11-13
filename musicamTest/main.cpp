@@ -11,6 +11,14 @@ void main(int argc, char *argv[])
 {
 	if (argc<6) {
 		cout<<"Usage: musicamTest <input.mp2> <output.mp2> <output id> <output bitrate> <output mode>"<<endl;
+		cout<<"		   - output id"<<endl;
+		cout<<"				0 : ISO/IEC 13818-3 for 24KHz sample freq"<<endl;
+		cout<<"				1 : ISO/IEC 11172-3 for 48KHz sample freq"<<endl;
+		cout<<"		   - output bitrate(kbps)"<<endl;
+		cout<<"				48kHz(32,48,56,64,80,96,112,128,160,192,224,256,320,384)"<<endl;
+		cout<<"				24KHz(8,16,24,32,40,48,56,64,80,96,112,128,144,160)"<<endl;
+		cout<<"		   - output mode"<<endl;
+		cout<<"				0(Stereo),1(JStereo),2(DualChannel),3(Mono)"<<endl;
 		return;
 	}
 
@@ -43,7 +51,7 @@ void main(int argc, char *argv[])
 		mc_parseMp2Header(&header,buffer);
 
 		if(nFrameCount==0) {
-			if(mc_encodeOption(m->opt,(HEADER_ID)atoi(argv[3]),atoi(argv[4]),(TWOLAME_MPEG_mode)atoi(argv[5]),1)!=0) {
+			if(mc_encodeOption(m->opt,mc_getSamplingFrequency(header.id),(HEADER_ID)atoi(argv[3]),atoi(argv[4]),(TWOLAME_MPEG_mode)atoi(argv[5]),1)!=0) {
 				cout<<mc_getLastError();
 				break;
 			}

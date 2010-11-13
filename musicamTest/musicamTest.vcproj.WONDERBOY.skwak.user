@@ -11,7 +11,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory=""
-				CommandArguments="../contents/stereo_48khz_128kbps.mp2 ../output/s_48khz_128k_n5.mp2 1 128 0"
+				CommandArguments="d:\mono\dab_48khz_stereo_128_subCh(1).mp2 d:\mono\t_24khz_mono_56.mp2 0 56 3"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"

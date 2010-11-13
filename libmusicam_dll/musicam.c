@@ -84,7 +84,8 @@ int mc_mp2_mp2_encode(mc* m,const unsigned char* inMp2frame,int inMp2frameSize,i
 
 	mc_parseMp2Header(&header,(unsigned char*)inMp2frame);
 	nRtn = mpg123_decode(m->mpg,inMp2frame,inMp2frameSize,(unsigned char*)pcm,PCM_BUF_SIZE,&size);
-	if(nRtn!=0) { sprintf_s(errMsg,sizeof(errMsg),"mpg123_decode() return %d",nRtn); return -1; }
+	if(nRtn!=0) {
+		sprintf_s(errMsg,sizeof(errMsg),"mpg123_decode() return %d",nRtn); return -1; }
 
 	if((TWOLAME_MPEG_version)header.id==TWOLAME_MPEG2 && ver==TWOLAME_MPEG1) {
 		nSize = mc_pcm24to48(pcm,m->convPcm,(int)size,(header.mode==3)?1:2);
@@ -160,13 +161,13 @@ int mc_getBitrate(int nId,int nBitrateIdx)
 	return 1000*bitrateTable[nId][nBitrateIdx];	//kbps unit
 }
 
-int mc_encodeOption(twolame_options* encopts,HEADER_ID id,int nDstBitrate,TWOLAME_MPEG_mode mpegMode,int verbose)
+int mc_encodeOption(twolame_options* encopts,int inpSampleFreq,HEADER_ID id,int nDstBitrate,TWOLAME_MPEG_mode mpegMode,int verbose)
 {
 	int nRtn = 0;
 
 	twolame_set_version(encopts,id);
 	twolame_set_rawmode(encopts, 1);
-	twolame_set_in_samplerate(encopts,mc_getSamplingFrequency(id));
+	twolame_set_in_samplerate(encopts,inpSampleFreq);
 	twolame_set_out_samplerate(encopts,twolame_get_in_samplerate(encopts));
 	twolame_set_mode(encopts,mpegMode);
 	twolame_set_num_channels(encopts,(mpegMode==TWOLAME_MONO)?1:2);
