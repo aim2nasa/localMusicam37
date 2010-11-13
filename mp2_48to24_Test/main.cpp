@@ -28,7 +28,7 @@ void main(void)
 		size_t nRead = fread(buffer,sizeof(unsigned char),1152*4*2,inpStream);	//read header only
 
 		if(nFrameCount==0) {
-			if(mc_encodeOption(m->opt,ISO_13818_3,128,TWOLAME_STEREO,1)!=0) {
+			if(mc_encodeOption(m->opt,24000,ISO_13818_3,128,TWOLAME_STEREO,1)!=0) {
 				cout<<mc_getLastError();
 				break;
 			}
