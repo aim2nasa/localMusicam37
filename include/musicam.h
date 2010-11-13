@@ -127,13 +127,14 @@ extern "C" {
 	/** set mp2 encode option
 	*	
 	*	\param encopts			pointer to twolame encode option
+	*	\param inpSampleFreq	sampling frequency of input stream
 	*	\param id				identifier in mp2 header (ISO_13818_3,ISO_11172_3)
 	*	\param nDstBitrate		desired bitrate of encoded birstream (kbps)
 	*	\param mpegMode			mode (streo,joint stereo,dual channel,mono)
 	*	\param verbose			verbosity control
 	*	\return					0 successful otherwise -1
 	*/
-	MUSICAM_DLL_EXPORT int mc_encodeOption(twolame_options* encopts,HEADER_ID id,int nDstBitrate,TWOLAME_MPEG_mode mpegMode,int verbose);
+	MUSICAM_DLL_EXPORT int mc_encodeOption(twolame_options* encopts,int inpSampleFreq,HEADER_ID id,int nDstBitrate,TWOLAME_MPEG_mode mpegMode,int verbose);
 
 	/** calculate bitrate using frame size and sample frequency
 	*	
