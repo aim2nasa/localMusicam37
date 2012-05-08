@@ -78,6 +78,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcmEncTest", "pcmEncTest\pc
 		{C82410C9-89A2-4ED2-96D8-03547BB9DA87} = {C82410C9-89A2-4ED2-96D8-03547BB9DA87}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "crcCalcTest", "crcCalcTest\crcCalcTest.vcproj", "{5F89096F-0B1F-479C-93C0-311452963D1C}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -156,6 +158,10 @@ Global
 		{7A041417-56F0-41D6-A913-A5B9A3BEC750}.Debug|Win32.Build.0 = Debug|Win32
 		{7A041417-56F0-41D6-A913-A5B9A3BEC750}.Release|Win32.ActiveCfg = Release|Win32
 		{7A041417-56F0-41D6-A913-A5B9A3BEC750}.Release|Win32.Build.0 = Release|Win32
+		{5F89096F-0B1F-479C-93C0-311452963D1C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5F89096F-0B1F-479C-93C0-311452963D1C}.Debug|Win32.Build.0 = Debug|Win32
+		{5F89096F-0B1F-479C-93C0-311452963D1C}.Release|Win32.ActiveCfg = Release|Win32
+		{5F89096F-0B1F-479C-93C0-311452963D1C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
