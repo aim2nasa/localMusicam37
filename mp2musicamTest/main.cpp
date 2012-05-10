@@ -1,5 +1,6 @@
 #include <iostream>
 #include <assert.h>
+#include "rBit.h"
 
 #define INBUFF			1152	//144*384/48 max frame size
 
@@ -65,23 +66,6 @@ static int getBitrate(int nId,int nBitrateIdx)
 static int frameSize(const MP2_HEADER* pHeader)
 {
 	return 144*getBitrate(pHeader->id,pHeader->bitrateIdx)/((pHeader->id)?48000:24000);
-}
-
-static int bit_window;
-static int bits_in_window;
-static const unsigned char *frame_pos;
-
-#define show_bits(bit_count) (bit_window >> (24 - (bit_count)))
-
-static int get_bits(int bit_count) {
-	int result = show_bits(bit_count);
-	bit_window = (bit_window << bit_count) & 0xFFFFFF;
-	bits_in_window -= bit_count;
-	while (bits_in_window < 16) {
-		bit_window |= (*frame_pos++) << (16 - bits_in_window);
-		bits_in_window += 8;
-	}
-	return result;
 }
 
 int getBitAllocTable(int nBitrateCh,int nSampleFreq)
@@ -192,14 +176,13 @@ int main(int argc, char *argv[])
 	bool bLoop = true;
 	int nFrameCount =0;
 	bool bInitFrame = true;
+	rBit* pRb = rBit_instance();
 	while( bLoop && !feof( inpStream ) ) {
 		size_t nRead = fread(frame,sizeof(unsigned char),4,inpStream);	//read header only
 		if(nRead&&nRead!=4) { bLoop=false; continue; }
 
 		// set up the bitstream reader
-		bit_window = (frame[2]<<16)|(frame[3]<<8);
-		bits_in_window = 16;
-		frame_pos = &frame[4];
+		rBit_init(pRb,frame+2);
 
 		parseMp2Header(&header,frame);
 		int nFrameSize = frameSize(&header);
@@ -207,8 +190,8 @@ int main(int argc, char *argv[])
 		nRead = fread(frame+4,sizeof(unsigned char),nFrameSize-4,inpStream);	//read rest of the frame
 		if(nRead&&nRead!=(nFrameSize-4)) { bLoop=false; continue; }
 
-		get_bits(16);
-		if(header.protect == 0) get_bits(16);
+		rBit_getBits(pRb,16);
+		if(header.protect == 0) rBit_getBits(pRb,16);
 
 
 
@@ -239,16 +222,16 @@ int main(int argc, char *argv[])
 		//bit allocation
 		for(int sb=0; sb<bound; sb++)
 			for (int ch=0; ch<nch; ch++)
-				bit_alloc[ch][sb] = get_bits(bitalloc_tbl[nTable][sb]);
+				bit_alloc[ch][sb] = rBit_getBits(pRb,bitalloc_tbl[nTable][sb]);
 		for (int sb=bound; sb<sblimit; sb++)
-			bit_alloc[0][sb] = bit_alloc[1][sb] = get_bits(bitalloc_tbl[nTable][sb]);
+			bit_alloc[0][sb] = bit_alloc[1][sb] = rBit_getBits(pRb,bitalloc_tbl[nTable][sb]);
 	
 		//scfsi
 		unsigned int scfsi[2][32];
 		for(int sb=0; sb<sblimit; sb++) {
 			for (int ch=0; ch < nch; ch++)
 				if (bit_alloc[ch][sb])
-					scfsi[ch][sb] = get_bits(2);
+					scfsi[ch][sb] = rBit_getBits(pRb,2);
 			if (header.mode == MONO)
 				scfsi[1][sb] = scfsi[0][sb];
 		}
@@ -259,21 +242,21 @@ int main(int argc, char *argv[])
 			for (int ch=0; ch<nch; ch++)
 				if (bit_alloc[ch][sb]) {
 					switch (scfsi[ch][sb]) {
-					case 0: scalefactor[ch][sb][0] = get_bits(6);
-							scalefactor[ch][sb][1] = get_bits(6);
-							scalefactor[ch][sb][2] = get_bits(6);
+					case 0: scalefactor[ch][sb][0] = rBit_getBits(pRb,6);
+							scalefactor[ch][sb][1] = rBit_getBits(pRb,6);
+							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
 							break;
 					case 1: scalefactor[ch][sb][0] =
-							scalefactor[ch][sb][1] = get_bits(6);
-							scalefactor[ch][sb][2] = get_bits(6);
+							scalefactor[ch][sb][1] = rBit_getBits(pRb,6);
+							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
 							break;
 					case 2: scalefactor[ch][sb][0] =
 							scalefactor[ch][sb][1] =
-							scalefactor[ch][sb][2] = get_bits(6);
+							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
 						break;
-					case 3: scalefactor[ch][sb][0] = get_bits(6);
+					case 3: scalefactor[ch][sb][0] = rBit_getBits(pRb,6);
 							scalefactor[ch][sb][1] =
-							scalefactor[ch][sb][2] = get_bits(6);
+							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
 						break;
 					}
 				}
@@ -312,6 +295,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "]\r");
 		fflush(stderr);
 	}
+	rBit_delete(pRb);
 	_fcloseall();
 	cout<<"end of main"<<endl;
 	return 0;
