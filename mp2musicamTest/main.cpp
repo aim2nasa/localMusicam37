@@ -67,26 +67,6 @@ static int frameSize(const MP2_HEADER* pHeader)
 	return 144*getBitrate(pHeader->id,pHeader->bitrateIdx)/((pHeader->id)?48000:24000);
 }
 
-// quantizer lookup, step 1: bitrate classes
-static const char quant_lut_step1[2][16] = {
-	// 32, 48, 56, 64, 80, 96,112,128,160,192,224,256,320,384 <- bitrate
-	{   0,  0,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,  2,  2 },  // mono
-	// 16, 24, 28, 32, 40, 48, 56, 64, 80, 96,112,128,160,192 <- BR / chan
-	{   0,  0,  0,  0,  0,  0,  1,  1,  1,  2,  2,  2,  2,  2 }   // stereo
-};
-
-// quantizer lookup, step 2: bitrate class, sample rate -> B2 table idx, sblimit
-#define QUANT_TAB_A (27 | 64)   // Table 3-B.2a: high-rate, sblimit = 27
-#define QUANT_TAB_B (30 | 64)   // Table 3-B.2b: high-rate, sblimit = 30
-#define QUANT_TAB_C   8         // Table 3-B.2c:  low-rate, sblimit =  8
-#define QUANT_TAB_D  12         // Table 3-B.2d:  low-rate, sblimit = 12
-static const char quant_lut_step2[3][4] = {
-	//   44.1 kHz,      48 kHz,      32 kHz
-	{ QUANT_TAB_C, QUANT_TAB_C, QUANT_TAB_D },  // 32 - 48 kbit/sec/ch
-	{ QUANT_TAB_A, QUANT_TAB_A, QUANT_TAB_A },  // 56 - 80 kbit/sec/ch
-	{ QUANT_TAB_B, QUANT_TAB_A, QUANT_TAB_B },  // 96+     kbit/sec/ch
-};
-
 static int bit_window;
 static int bits_in_window;
 static const unsigned char *frame_pos;
@@ -107,7 +87,7 @@ static int get_bits(int bit_count) {
 int getBitAllocTable(int nBitrateCh,int nSampleFreq)
 {
 	if(nSampleFreq==24) {
-		return 2;	//Table 15
+		return 2;		//Table 15
 	}else if(nSampleFreq==48) {
 		if(nBitrateCh==56||nBitrateCh==64||nBitrateCh==80||nBitrateCh==96||nBitrateCh==112||
 			nBitrateCh==128||nBitrateCh==160||nBitrateCh==192) 
