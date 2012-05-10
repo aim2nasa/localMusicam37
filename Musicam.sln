@@ -80,6 +80,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcmEncTest", "pcmEncTest\pc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "crcCalcTest", "crcCalcTest\crcCalcTest.vcproj", "{5F89096F-0B1F-479C-93C0-311452963D1C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mp2musicamTest", "mp2musicamTest\mp2musicamTest.vcproj", "{2E786958-65F9-40F9-A2C1-A7395BF2823A}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -162,6 +164,10 @@ Global
 		{5F89096F-0B1F-479C-93C0-311452963D1C}.Debug|Win32.Build.0 = Debug|Win32
 		{5F89096F-0B1F-479C-93C0-311452963D1C}.Release|Win32.ActiveCfg = Release|Win32
 		{5F89096F-0B1F-479C-93C0-311452963D1C}.Release|Win32.Build.0 = Release|Win32
+		{2E786958-65F9-40F9-A2C1-A7395BF2823A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2E786958-65F9-40F9-A2C1-A7395BF2823A}.Debug|Win32.Build.0 = Debug|Win32
+		{2E786958-65F9-40F9-A2C1-A7395BF2823A}.Release|Win32.ActiveCfg = Release|Win32
+		{2E786958-65F9-40F9-A2C1-A7395BF2823A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
