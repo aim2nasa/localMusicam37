@@ -301,16 +301,20 @@ int main(int argc, char *argv[])
 						scalefactor[1][sb][part] = scalefactor[0][sb][part];
 		}
 
-		//비트레이트에 따라 dabExt크기 조절 및 CRC복사 부분 수정필요
-		int dabExt = 4;
+		int dabExtension = 4;
+		((bit_rate/num_channel) >= 56)? dabExtension=4:dabExtension=2;
+
 		unsigned int scfCrc[4];
-		for(int i = dabExt-1;i>=0;i--) {
+		memset(scfCrc,0,sizeof(scfCrc));
+		for(int i = dabExtension-1;i>=0;i--) {
 			CRC_calcDAB(nch,sblimit,bit_alloc,scfsi,scalefactor,&scfCrc[i],i);
 		}
 
 		memcpy(outFrame,frame,nFrameSize);
-		outFrame[nFrameSize-6]=scfCrc[3];
-		outFrame[nFrameSize-5]=scfCrc[2];
+		if(dabExtension==4) {
+			outFrame[nFrameSize-6]=scfCrc[3];
+			outFrame[nFrameSize-5]=scfCrc[2];
+		}
 		outFrame[nFrameSize-4]=scfCrc[1];
 		outFrame[nFrameSize-3]=scfCrc[0];
 
