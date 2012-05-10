@@ -1,8 +1,7 @@
 #include <iostream>
 #include <assert.h>
 
-#define INBUFF			16384
-#define OUTBUFF			32768 
+#define INBUFF			1152	//144*384/48 max frame size
 
 #define ID_ISO13818		0
 #define ID_ISO11172		1
@@ -206,14 +205,16 @@ int main(int argc, char *argv[])
 	}
 
 	unsigned char frame[INBUFF];
-	unsigned char outFrame[OUTBUFF];
+	unsigned char outFrame[INBUFF];
 	size_t size = 0;
 	MP2_HEADER header;
 
+	bool bLoop = true;
 	int nFrameCount =0;
-	while( !feof( inpStream ) ) {
+	bool bInitFrame = true;
+	while( bLoop && !feof( inpStream ) ) {
 		size_t nRead = fread(frame,sizeof(unsigned char),4,inpStream);	//read header only
-		if(nRead&&nRead!=4) continue;	//EOF
+		if(nRead&&nRead!=4) { bLoop=false; continue; }
 
 		// set up the bitstream reader
 		bit_window = (frame[2]<<16)|(frame[3]<<8);
@@ -224,7 +225,7 @@ int main(int argc, char *argv[])
 		int nFrameSize = frameSize(&header);
 
 		nRead = fread(frame+4,sizeof(unsigned char),nFrameSize-4,inpStream);	//read rest of the frame
-		if(nRead&&nRead!=(nFrameSize-4)) continue;	//EOF
+		if(nRead&&nRead!=(nFrameSize-4)) { bLoop=false; continue; }
 
 		get_bits(16);
 		if(header.protect == 0) get_bits(16);
@@ -310,16 +311,22 @@ int main(int argc, char *argv[])
 			CRC_calcDAB(nch,sblimit,bit_alloc,scfsi,scalefactor,&scfCrc[i],i);
 		}
 
-		memcpy(outFrame,frame,nFrameSize);
-		if(dabExtension==4) {
-			outFrame[nFrameSize-6]=scfCrc[3];
-			outFrame[nFrameSize-5]=scfCrc[2];
-		}
-		outFrame[nFrameSize-4]=scfCrc[1];
-		outFrame[nFrameSize-3]=scfCrc[0];
+		if(bInitFrame){
+			bInitFrame=false;
+			memcpy(outFrame,frame,nFrameSize);
+		}else{
+			if(dabExtension==4) {
+				outFrame[nFrameSize-6]=scfCrc[3];
+				outFrame[nFrameSize-5]=scfCrc[2];
+			}
+			outFrame[nFrameSize-4]=scfCrc[1];
+			outFrame[nFrameSize-3]=scfCrc[0];
 
-		size_t nWrite = fwrite(outFrame,sizeof(unsigned char),nFrameSize,outStream);
-		assert(nWrite==nFrameSize);
+			size_t nWrite = fwrite(outFrame,sizeof(unsigned char),nFrameSize,outStream);
+			assert(nWrite==nFrameSize);
+
+			memcpy(outFrame,frame,nFrameSize);
+		}
 
 		fprintf(stderr, "[%04i", ++nFrameCount);
 		fprintf(stderr, "]\r");
