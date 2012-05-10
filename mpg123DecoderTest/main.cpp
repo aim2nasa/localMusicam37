@@ -107,11 +107,12 @@ int main(int argc, char *argv[])
 	int nFrameCount =0;
 	while( !feof( inpStream ) ) {
 		size_t nRead = fread(mp2buffer,sizeof(unsigned char),4,inpStream);	//read header only
+		if(nRead&&nRead!=4) continue;	//EOF
 		parseMp2Header(&header,mp2buffer);
 
 		int nSrcBufferSize = 144*getBitrate(header.id,header.bitrateIdx)/((header.id)?48000:24000);
 		nRead = fread(mp2buffer+4,sizeof(unsigned char),nSrcBufferSize-4,inpStream);	//read rest of the frame
-		if(nRead) assert(nRead==(nSrcBufferSize-4));
+		if(nRead&&nRead!=(nSrcBufferSize-4)) continue;	//EOF
 
 		size_t nWrite = 0;
 		int ret = mpg123_decode(m,mp2buffer,nSrcBufferSize,pcmBuffer,OUTBUFF,&size);                                                      
