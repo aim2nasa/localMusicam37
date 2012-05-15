@@ -71,6 +71,11 @@ const MP2_HEADER* fsc_header(frmScfCrc* p)
 	return &p->header;
 }
 
+int fsc_frameSize(frmScfCrc* p)
+{
+	return frameSize(&p->header);
+}
+
 void parseMp2Header(MP2_HEADER* pHeader,unsigned char* pBuffer)
 {
 	pHeader->sync		= (((unsigned short)pBuffer[0]&0xFF)<<4) | (((unsigned short)pBuffer[1]&0xF0)>>4);

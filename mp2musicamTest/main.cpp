@@ -203,9 +203,8 @@ int main(int argc, char *argv[])
 		pFrmScfCrc->dabExtension = getDabExt(pFrmScfCrc->bit_rate,pFrmScfCrc->nch);
 
 		memset(pFrmScfCrc->scfCrc,0,sizeof(pFrmScfCrc->scfCrc));
-		for(int i = pFrmScfCrc->dabExtension-1;i>=0;i--) {
+		for(int i = pFrmScfCrc->dabExtension-1;i>=0;i--)
 			CRC_calcDAB(pFrmScfCrc->nch,pFrmScfCrc->sblimit,pFrmScfCrc->bit_alloc,pFrmScfCrc->scfsi,pFrmScfCrc->scalefactor,&pFrmScfCrc->scfCrc[i],i);
-		}
 
 		if(pFrmScfCrc->bInitFrame){
 			pFrmScfCrc->bInitFrame=0;

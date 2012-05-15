@@ -33,6 +33,7 @@ extern "C" {
 	DLL_EXPORT void fsc_delete(frmScfCrc* p);
 	DLL_EXPORT void fsc_init(frmScfCrc* p,unsigned char* pFrame);
 	DLL_EXPORT const MP2_HEADER* fsc_header(frmScfCrc* p);
+	DLL_EXPORT int fsc_frameSize(frmScfCrc* p);
 
 #ifdef __cplusplus
 }
