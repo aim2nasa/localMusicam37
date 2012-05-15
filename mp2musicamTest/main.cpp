@@ -1,86 +1,19 @@
 #include <iostream>
 #include <assert.h>
 #include "rBit.h"
+#include "frmScfCrc.h"
 
 #define INBUFF			1152	//144*384/48 max frame size
-
-#define ID_ISO13818		0
-#define ID_ISO11172		1
-#define STEREO			0
-#define JOINT_STEREO	1
-#define DUAL_CHANNEL	2
-#define MONO			3
 
 #define SBLIMIT			32
 #define CRC8_POLYNOMIAL 0x1D
 
-#pragma pack(push, 1)
-typedef struct{
-	unsigned short sync:12;
-	unsigned short id:1;
-	unsigned short layer:2;
-	unsigned short protect:1;
-	unsigned short bitrateIdx:4;
-	unsigned short sampling:2;
-	unsigned short padding:1;
-	unsigned short priv:1;
-	unsigned short mode:2;
-	unsigned short mode_ext:2;
-	unsigned short copyright:1;
-	unsigned short orignal:1;
-	unsigned short emphasis:2;
-}MP2_HEADER;
-#pragma pack(pop)
 
-static const int bitrateTable[2][15]={
-	{0,8,16,24,32,40,48,56,64,80,96,112,128,144,160},		//for 24KHz
-	{0,32,48,56,64,80,96,112,128,160,192,224,256,320,384}	//for 48KHz
-};
 
-unsigned char sblimit_tbl[3]={ 27,8,30 };
 
-void parseMp2Header(MP2_HEADER* pHeader,unsigned char* pBuffer)
-{
-	pHeader->sync		= (((unsigned short)pBuffer[0]&0xFF)<<4) | (((unsigned short)pBuffer[1]&0xF0)>>4);
-	pHeader->id			= (pBuffer[1]&0x08)>>3;
-	pHeader->layer		= (pBuffer[1]&0x06)>>1;
-	pHeader->protect	= (pBuffer[1]&0x01);
-	pHeader->bitrateIdx	= (pBuffer[2]&0xF0)>>4;
-	pHeader->sampling	= (pBuffer[2]&0x0C)>>2;
-	pHeader->padding	= (pBuffer[2]&0x02)>>1;
-	pHeader->priv		= (pBuffer[2]&0x01);
-	pHeader->mode		= (pBuffer[3]&0xC0)>>6;
-	pHeader->mode_ext	= (pBuffer[3]&0x30)>>4;
-	pHeader->copyright	= (pBuffer[3]&0x08)>>3;
-	pHeader->orignal	= (pBuffer[3]&0x04)>>2;
-	pHeader->emphasis	= (pBuffer[3]&0x03);
-}
 
-static int getBitrate(int nId,int nBitrateIdx)
-{
-	assert(nId==0 || nId==1);
-	assert(nBitrateIdx>0 && nBitrateIdx<15);
-	return 1000*bitrateTable[nId][nBitrateIdx];	//kbps unit
-}
 
-static int frameSize(const MP2_HEADER* pHeader)
-{
-	return 144*getBitrate(pHeader->id,pHeader->bitrateIdx)/((pHeader->id)?48000:24000);
-}
 
-int getBitAllocTable(int nBitrateCh,int nSampleFreq)
-{
-	if(nSampleFreq==24) {
-		return 2;		//Table 15
-	}else if(nSampleFreq==48) {
-		if(nBitrateCh==56||nBitrateCh==64||nBitrateCh==80||nBitrateCh==96||nBitrateCh==112||
-			nBitrateCh==128||nBitrateCh==160||nBitrateCh==192) 
-			return 0;	//Table 13
-		else if(nBitrateCh==32||nBitrateCh==48) 
-			return 1;	//Table14
-	}
-	return -1;
-}
 
 static const int bitalloc_tbl[3][32] = {
 	{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3,
@@ -145,6 +78,67 @@ void CRC_calcDAB (int nch,int sblimit,
 				}
 }
 
+void doBitAlloc(rBit* pRb,int bound,int sblimit,int nch,int nTable,unsigned int bit_alloc[2][32])
+{
+	memset(bit_alloc,0,sizeof(bit_alloc));
+
+	for(int sb=0; sb<bound; sb++)
+		for (int ch=0; ch<nch; ch++)
+			bit_alloc[ch][sb] = rBit_getBits(pRb,bitalloc_tbl[nTable][sb]);
+	for (int sb=bound; sb<sblimit; sb++)
+		bit_alloc[0][sb] = bit_alloc[1][sb] = rBit_getBits(pRb,bitalloc_tbl[nTable][sb]);
+}
+
+void doScfsi(rBit* pRb,const MP2_HEADER* pHeader,int sblimit,int nch,unsigned int bit_alloc[2][32],unsigned int scfsi[2][32])
+{
+	memset(scfsi,0,sizeof(scfsi));
+
+	for(int sb=0; sb<sblimit; sb++) {
+		for (int ch=0; ch < nch; ch++)
+			if (bit_alloc[ch][sb])
+				scfsi[ch][sb] = rBit_getBits(pRb,2);
+		if (pHeader->mode == MONO)
+			scfsi[1][sb] = scfsi[0][sb];
+	}
+}
+
+void doScaleFactor(rBit* pRb,const MP2_HEADER* pHeader,int sblimit,int nch,unsigned int bit_alloc[2][32],unsigned int scfsi[2][32],unsigned int scalefactor[2][32][3])
+{
+	memset(scalefactor,0,sizeof(scalefactor));
+
+	for (int sb=0; sb<sblimit; sb++) {
+		for (int ch=0; ch<nch; ch++)
+			if (bit_alloc[ch][sb]) {
+				switch (scfsi[ch][sb]) {
+					case 0: scalefactor[ch][sb][0] = rBit_getBits(pRb,6);
+							scalefactor[ch][sb][1] = rBit_getBits(pRb,6);
+							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
+							break;
+					case 1: scalefactor[ch][sb][0] =
+							scalefactor[ch][sb][1] = rBit_getBits(pRb,6);
+							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
+							break;
+					case 2: scalefactor[ch][sb][0] =
+							scalefactor[ch][sb][1] =
+							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
+							break;
+					case 3: scalefactor[ch][sb][0] = rBit_getBits(pRb,6);
+							scalefactor[ch][sb][1] =
+							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
+							break;
+				}
+			}
+			if(pHeader->mode == MONO)
+				for(int part=0; part<3; part++)
+					scalefactor[1][sb][part] = scalefactor[0][sb][part];
+	}
+}
+
+int getDabExt(int bit_rate,int num_channel)
+{
+	return ((bit_rate/num_channel) >= 56)? 4:2;
+}
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -168,134 +162,72 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	frmScfCrc* pFrmScfCrc = fsc_instance();
+
 	unsigned char frame[INBUFF];
 	unsigned char outFrame[INBUFF];
 	size_t size = 0;
-	MP2_HEADER header;
+
+	size_t nRead = fread(frame,sizeof(unsigned char),4,inpStream);	//read header only
+	assert(nRead==4);
+	fseek(inpStream,-4,SEEK_CUR);
+	fsc_init(pFrmScfCrc,frame);
+
+
 
 	bool bLoop = true;
 	int nFrameCount =0;
-	bool bInitFrame = true;
+	//bool bInitFrame = true;
 	rBit* pRb = rBit_instance();
 	while( bLoop && !feof( inpStream ) ) {
-		size_t nRead = fread(frame,sizeof(unsigned char),4,inpStream);	//read header only
-		if(nRead&&nRead!=4) { bLoop=false; continue; }
+		size_t nRead = fread(frame,sizeof(unsigned char),pFrmScfCrc->nFrameSize,inpStream);
+		if(nRead&&nRead!=pFrmScfCrc->nFrameSize) { bLoop=false; continue; }
 
 		// set up the bitstream reader
 		rBit_init(pRb,frame+2);
 
-		parseMp2Header(&header,frame);
-		int nFrameSize = frameSize(&header);
-
-		nRead = fread(frame+4,sizeof(unsigned char),nFrameSize-4,inpStream);	//read rest of the frame
-		if(nRead&&nRead!=(nFrameSize-4)) { bLoop=false; continue; }
-
 		rBit_getBits(pRb,16);
-		if(header.protect == 0) rBit_getBits(pRb,16);
+		if(fsc_header(pFrmScfCrc)->protect == 0) rBit_getBits(pRb,16);
 
 
-
-		int bit_rate = bitrateTable[header.id][header.bitrateIdx];	// kbit/s
-		int sample_freq = 0;
-		if(header.id == ID_ISO13818){
-			sample_freq = 24;
-		}else{
-			assert(header.id == ID_ISO11172);
-			sample_freq = 48;
-		}
-
-		int num_channel=2;
-		if(header.mode==MONO) num_channel=1;
-
-		int nTable = getBitAllocTable(bit_rate/num_channel,sample_freq);
-		assert(nTable!=-1);
-		int sblimit = sblimit_tbl[nTable];
-
-		int bound = sblimit;
-		// parse the mode_extension, set up the stereo bound
-		if (header.mode == JOINT_STEREO) bound = (header.mode_ext + 1) << 2;
-
-		unsigned int bit_alloc[2][32];
-		memset(bit_alloc,0,sizeof(bit_alloc));
-
-		int nch = (header.mode == MONO)?1:2;
 		//bit allocation
-		for(int sb=0; sb<bound; sb++)
-			for (int ch=0; ch<nch; ch++)
-				bit_alloc[ch][sb] = rBit_getBits(pRb,bitalloc_tbl[nTable][sb]);
-		for (int sb=bound; sb<sblimit; sb++)
-			bit_alloc[0][sb] = bit_alloc[1][sb] = rBit_getBits(pRb,bitalloc_tbl[nTable][sb]);
-	
+		doBitAlloc(pRb,pFrmScfCrc->bound,pFrmScfCrc->sblimit,pFrmScfCrc->nch,pFrmScfCrc->nTable,pFrmScfCrc->bit_alloc);
+
 		//scfsi
-		unsigned int scfsi[2][32];
-		for(int sb=0; sb<sblimit; sb++) {
-			for (int ch=0; ch < nch; ch++)
-				if (bit_alloc[ch][sb])
-					scfsi[ch][sb] = rBit_getBits(pRb,2);
-			if (header.mode == MONO)
-				scfsi[1][sb] = scfsi[0][sb];
-		}
+		doScfsi(pRb,&pFrmScfCrc->header,pFrmScfCrc->sblimit,pFrmScfCrc->nch,pFrmScfCrc->bit_alloc,pFrmScfCrc->scfsi);
 
 		//scale factors
-		unsigned int scalefactor[2][32][3];
-		for (int sb=0; sb<sblimit; sb++) {
-			for (int ch=0; ch<nch; ch++)
-				if (bit_alloc[ch][sb]) {
-					switch (scfsi[ch][sb]) {
-					case 0: scalefactor[ch][sb][0] = rBit_getBits(pRb,6);
-							scalefactor[ch][sb][1] = rBit_getBits(pRb,6);
-							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
-							break;
-					case 1: scalefactor[ch][sb][0] =
-							scalefactor[ch][sb][1] = rBit_getBits(pRb,6);
-							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
-							break;
-					case 2: scalefactor[ch][sb][0] =
-							scalefactor[ch][sb][1] =
-							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
-						break;
-					case 3: scalefactor[ch][sb][0] = rBit_getBits(pRb,6);
-							scalefactor[ch][sb][1] =
-							scalefactor[ch][sb][2] = rBit_getBits(pRb,6);
-						break;
-					}
-				}
-				if (header.mode == MONO)
-					for(int part=0; part<3; part++)
-						scalefactor[1][sb][part] = scalefactor[0][sb][part];
+		doScaleFactor(pRb,&pFrmScfCrc->header,pFrmScfCrc->sblimit,pFrmScfCrc->nch,pFrmScfCrc->bit_alloc,pFrmScfCrc->scfsi,pFrmScfCrc->scalefactor);
+
+		pFrmScfCrc->dabExtension = getDabExt(pFrmScfCrc->bit_rate,pFrmScfCrc->nch);
+
+		memset(pFrmScfCrc->scfCrc,0,sizeof(pFrmScfCrc->scfCrc));
+		for(int i = pFrmScfCrc->dabExtension-1;i>=0;i--) {
+			CRC_calcDAB(pFrmScfCrc->nch,pFrmScfCrc->sblimit,pFrmScfCrc->bit_alloc,pFrmScfCrc->scfsi,pFrmScfCrc->scalefactor,&pFrmScfCrc->scfCrc[i],i);
 		}
 
-		int dabExtension = 4;
-		((bit_rate/num_channel) >= 56)? dabExtension=4:dabExtension=2;
-
-		unsigned int scfCrc[4];
-		memset(scfCrc,0,sizeof(scfCrc));
-		for(int i = dabExtension-1;i>=0;i--) {
-			CRC_calcDAB(nch,sblimit,bit_alloc,scfsi,scalefactor,&scfCrc[i],i);
-		}
-
-		if(bInitFrame){
-			bInitFrame=false;
-			memcpy(outFrame,frame,nFrameSize);
+		if(pFrmScfCrc->bInitFrame){
+			pFrmScfCrc->bInitFrame=0;
 		}else{
-			if(dabExtension==4) {
-				outFrame[nFrameSize-6]=scfCrc[3];
-				outFrame[nFrameSize-5]=scfCrc[2];
+			if(pFrmScfCrc->dabExtension==4) {
+				outFrame[pFrmScfCrc->nFrameSize-6]=pFrmScfCrc->scfCrc[3];
+				outFrame[pFrmScfCrc->nFrameSize-5]=pFrmScfCrc->scfCrc[2];
 			}
-			outFrame[nFrameSize-4]=scfCrc[1];
-			outFrame[nFrameSize-3]=scfCrc[0];
+			outFrame[pFrmScfCrc->nFrameSize-4]=pFrmScfCrc->scfCrc[1];
+			outFrame[pFrmScfCrc->nFrameSize-3]=pFrmScfCrc->scfCrc[0];
 
-			size_t nWrite = fwrite(outFrame,sizeof(unsigned char),nFrameSize,outStream);
-			assert(nWrite==nFrameSize);
-
-			memcpy(outFrame,frame,nFrameSize);
+			size_t nWrite = fwrite(outFrame,sizeof(unsigned char),pFrmScfCrc->nFrameSize,outStream);
+			assert(nWrite==pFrmScfCrc->nFrameSize);
 		}
+		memcpy(outFrame,frame,pFrmScfCrc->nFrameSize);
 
 		fprintf(stderr, "[%04i", ++nFrameCount);
 		fprintf(stderr, "]\r");
 		fflush(stderr);
 	}
 	rBit_delete(pRb);
+	fsc_delete(pFrmScfCrc);
+
 	_fcloseall();
 	cout<<"end of main"<<endl;
 	return 0;
