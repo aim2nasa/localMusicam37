@@ -61,6 +61,11 @@ void fsc_init(frmScfCrc* p,unsigned char* pFrame)
 	memset(p->scfCrc,0,sizeof(p->scfCrc));
 }
 
+//int fsc_applyScfCrc(frmScfCrc* p,unsigned char* pFrame)
+//{
+//	return 0;
+//}
+
 const MP2_HEADER* fsc_header(frmScfCrc* p)
 {
 	return &p->header;
