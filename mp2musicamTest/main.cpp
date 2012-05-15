@@ -139,6 +139,14 @@ int getDabExt(int bit_rate,int num_channel)
 	return ((bit_rate/num_channel) >= 56)? 4:2;
 }
 
+size_t peepHeader(FILE *stream,unsigned char* pFrame)
+{
+	size_t nRead = fread(pFrame,sizeof(unsigned char),4,stream);	//read header only
+	assert(nRead==4);
+	fseek(stream,-4,SEEK_CUR);	//reset location
+	return nRead;
+}
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -168,27 +176,20 @@ int main(int argc, char *argv[])
 	unsigned char outFrame[INBUFF];
 	size_t size = 0;
 
-	size_t nRead = fread(frame,sizeof(unsigned char),4,inpStream);	//read header only
-	assert(nRead==4);
-	fseek(inpStream,-4,SEEK_CUR);
+	peepHeader(inpStream,frame);
 	fsc_init(pFrmScfCrc,frame);
-
-
 
 	bool bLoop = true;
 	int nFrameCount =0;
-	//bool bInitFrame = true;
 	rBit* pRb = rBit_instance();
 	while( bLoop && !feof( inpStream ) ) {
 		size_t nRead = fread(frame,sizeof(unsigned char),pFrmScfCrc->nFrameSize,inpStream);
-		if(nRead&&nRead!=pFrmScfCrc->nFrameSize) { bLoop=false; continue; }
+		if(nRead!=pFrmScfCrc->nFrameSize) { bLoop=false; continue; }
 
 		// set up the bitstream reader
 		rBit_init(pRb,frame+2);
-
 		rBit_getBits(pRb,16);
 		if(fsc_header(pFrmScfCrc)->protect == 0) rBit_getBits(pRb,16);
-
 
 		//bit allocation
 		doBitAlloc(pRb,pFrmScfCrc->bound,pFrmScfCrc->sblimit,pFrmScfCrc->nch,pFrmScfCrc->nTable,pFrmScfCrc->bit_alloc);
