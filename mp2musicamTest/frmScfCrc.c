@@ -19,7 +19,6 @@ static const int bitalloc_tbl[3][32] = {
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0},	//24KHz Table15
 };
 
-void parseMp2Header(MP2_HEADER* pHeader,unsigned char* pBuffer);
 int getBitAllocTable(int nBitrateCh,int nSampleFreq);
 int getBound(const MP2_HEADER* pHeader,int sblimit);
 int getBitrate(int nId,int nBitrateIdx);
@@ -115,23 +114,6 @@ const MP2_HEADER* fsc_header(frmScfCrc* p)
 int fsc_frameSize(frmScfCrc* p)
 {
 	return frameSize(&p->header);
-}
-
-void parseMp2Header(MP2_HEADER* pHeader,unsigned char* pBuffer)
-{
-	pHeader->sync		= (((unsigned short)pBuffer[0]&0xFF)<<4) | (((unsigned short)pBuffer[1]&0xF0)>>4);
-	pHeader->id			= (pBuffer[1]&0x08)>>3;
-	pHeader->layer		= (pBuffer[1]&0x06)>>1;
-	pHeader->protect	= (pBuffer[1]&0x01);
-	pHeader->bitrateIdx	= (pBuffer[2]&0xF0)>>4;
-	pHeader->sampling	= (pBuffer[2]&0x0C)>>2;
-	pHeader->padding	= (pBuffer[2]&0x02)>>1;
-	pHeader->priv		= (pBuffer[2]&0x01);
-	pHeader->mode		= (pBuffer[3]&0xC0)>>6;
-	pHeader->mode_ext	= (pBuffer[3]&0x30)>>4;
-	pHeader->copyright	= (pBuffer[3]&0x08)>>3;
-	pHeader->orignal	= (pBuffer[3]&0x04)>>2;
-	pHeader->emphasis	= (pBuffer[3]&0x03);
 }
 
 int getBitAllocTable(int nBitrateCh,int nSampleFreq)
@@ -288,7 +270,7 @@ void CRC_calcDAB (int nch,int sblimit,
 
 void initVariables(frmScfCrc* p,unsigned char* pFrame)
 {
-	parseMp2Header(&p->header,pFrame);
+	mp2h_parse(&p->header,pFrame);
 
 	p->nFrameSize = frameSize(&p->header);
 	if(p->header.mode==MONO) {p->nch=1;}else{p->nch=2;}
