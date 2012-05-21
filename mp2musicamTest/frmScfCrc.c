@@ -25,6 +25,7 @@ int getBound(const MP2_HEADER* pHeader,int sblimit);
 int getBitrate(int nId,int nBitrateIdx);
 int frameSize(const MP2_HEADER* pHeader);
 int getDabExt(int bit_rate,int num_channel);
+void initVariables(frmScfCrc* p,unsigned char* pFrame);
 void doBitAlloc(rBit* pRb,int bound,int sblimit,int nch,int nTable,unsigned int bit_alloc[2][32]);
 void doScfsi(rBit* pRb,const MP2_HEADER* pHeader,int sblimit,int nch,unsigned int bit_alloc[2][32],unsigned int scfsi[2][32]);
 void doScaleFactor(rBit* pRb,const MP2_HEADER* pHeader,int sblimit,int nch,unsigned int bit_alloc[2][32],unsigned int scfsi[2][32],unsigned int scalefactor[2][32][3]);
@@ -53,32 +54,12 @@ void fsc_init(frmScfCrc* p,unsigned char* pFrame)
 	p->pFrame = pFrame;
 	p->bInitFrame = 1;
 
-	parseMp2Header(&p->header,pFrame);
-
-	p->nFrameSize = frameSize(&p->header);
-	if(p->header.mode==MONO) {p->nch=1;}else{p->nch=2;}
-	p->bit_rate = bitrateTable[p->header.id][p->header.bitrateIdx];	// kbit/s
-
-	switch(p->header.id){
-		case ID_ISO13818:
-			p->sample_freq = 24;
-			break;
-		case ID_ISO11172:
-			p->sample_freq = 48;
-			break;
-		default:
-			assert(0);
-	}
-
-	p->nTable = getBitAllocTable(p->bit_rate/p->nch,p->sample_freq);
-	assert(p->nTable!=-1);
-	p->sblimit = sblimit_tbl[p->nTable];
-	p->bound = getBound(&p->header,p->sblimit);
-
 	memset(p->bit_alloc,0,sizeof(p->bit_alloc));
 	memset(p->scfsi,0,sizeof(p->scfsi));
 	memset(p->scalefactor,0,sizeof(p->scalefactor));
 	memset(p->scfCrc,0,sizeof(p->scfCrc));
+
+	initVariables(p,pFrame);
 }
 
 int fsc_applyScfCrc(frmScfCrc* p,unsigned char* pFrame)
@@ -86,8 +67,7 @@ int fsc_applyScfCrc(frmScfCrc* p,unsigned char* pFrame)
 	int i;
 	memcpy(p->inpFrame,pFrame,p->nFrameSize);
 
-	parseMp2Header(&p->header,pFrame);
-	p->bound = getBound(&p->header,p->sblimit);
+	initVariables(p,pFrame);
 
 	// set up the bitstream reader
 	rBit_init(p->pRb,pFrame+2);
@@ -304,4 +284,29 @@ void CRC_calcDAB (int nch,int sblimit,
 						nb_scalar++;
 						update_CRCDAB (scalar[k][i][0] >> 3, 3, crc);
 			}
+}
+
+void initVariables(frmScfCrc* p,unsigned char* pFrame)
+{
+	parseMp2Header(&p->header,pFrame);
+
+	p->nFrameSize = frameSize(&p->header);
+	if(p->header.mode==MONO) {p->nch=1;}else{p->nch=2;}
+	p->bit_rate = bitrateTable[p->header.id][p->header.bitrateIdx];	// kbit/s
+
+	switch(p->header.id){
+		case ID_ISO13818:
+			p->sample_freq = 24;
+			break;
+		case ID_ISO11172:
+			p->sample_freq = 48;
+			break;
+		default:
+			assert(0);
+	}
+
+	p->nTable = getBitAllocTable(p->bit_rate/p->nch,p->sample_freq);
+	assert(p->nTable!=-1);
+	p->sblimit = sblimit_tbl[p->nTable];
+	p->bound = getBound(&p->header,p->sblimit);
 }
