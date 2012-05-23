@@ -179,7 +179,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\frmScfCrc.c"
+				RelativePath="..\src\frmScfCrc.c"
 				>
 			</File>
 			<File
@@ -187,11 +187,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\mp2Header.c"
+				RelativePath="..\src\mp2Header.c"
 				>
 			</File>
 			<File
-				RelativePath=".\rBit.c"
+				RelativePath="..\src\rBit.c"
 				>
 			</File>
 		</Filter>
@@ -201,15 +201,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\frmScfCrc.h"
+				RelativePath="..\include\frmScfCrc.h"
 				>
 			</File>
 			<File
-				RelativePath=".\mp2Header.h"
+				RelativePath="..\include\mp2Header.h"
 				>
 			</File>
 			<File
-				RelativePath=".\rBit.h"
+				RelativePath="..\include\rbit.h"
 				>
 			</File>
 		</Filter>
