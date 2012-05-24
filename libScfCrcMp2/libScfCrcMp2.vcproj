@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="mp2musicamTest"
-	ProjectGUID="{2E786958-65F9-40F9-A2C1-A7395BF2823A}"
-	RootNamespace="mp2musicamTest"
+	Name="libScfCrcMp2"
+	ProjectGUID="{D9348F1D-F3C5-44D1-9D99-DA0081E45826}"
+	RootNamespace="libScfCrcMp2"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="..\bin\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="..\bin\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSCFCRCMP2_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -62,9 +62,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -96,7 +95,7 @@
 			Name="Release|Win32"
 			OutputDirectory="..\bin\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="..\bin\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -118,7 +117,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSCFCRCMP2_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -137,9 +136,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -179,7 +177,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\main.cpp"
+				RelativePath="..\src\frmScfCrc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\src\mp2Header.c"
+				>
+			</File>
+			<File
+				RelativePath="..\src\rBit.c"
 				>
 			</File>
 		</Filter>
@@ -188,6 +194,18 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\include\frmScfCrc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\mp2Header.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\rbit.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="리소스 파일"
