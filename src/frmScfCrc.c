@@ -61,6 +61,14 @@ void fsc_init(frmScfCrc* p,unsigned char* pFrame)
 	initVariables(p,pFrame);
 }
 
+size_t fsc_peepHeader(FILE *stream,unsigned char* pFrame)
+{
+	size_t nRead = fread(pFrame,sizeof(unsigned char),4,stream);	//read header only
+	assert(nRead==4);
+	fseek(stream,-4,SEEK_CUR);	//reset location
+	return nRead;
+}
+
 int fsc_applyScfCrc(frmScfCrc* p,unsigned char* pFrame)
 {
 	int i;
@@ -111,9 +119,14 @@ const MP2_HEADER* fsc_header(frmScfCrc* p)
 	return &p->header;
 }
 
-int fsc_frameSize(frmScfCrc* p)
+int fsc_frameSize(const MP2_HEADER* pHeader)
 {
-	return frameSize(&p->header);
+	return frameSize(pHeader);
+}
+
+int fsc_getDabExt(int bit_rate,int num_channel)
+{
+	return getDabExt(bit_rate,num_channel);
 }
 
 int getBitAllocTable(int nBitrateCh,int nSampleFreq)

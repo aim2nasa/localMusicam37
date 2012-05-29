@@ -3,6 +3,7 @@
 
 #include "mp2Header.h"
 #include "rbit.h"
+#include <stdio.h>
 
 #define MAXBUF			1152	//144*384/48 max frame size
 #define SBLIMIT			32
@@ -43,9 +44,11 @@ extern "C" {
 	DLL_EXPORT frmScfCrc* fsc_instance();
 	DLL_EXPORT void fsc_delete(frmScfCrc* p);
 	DLL_EXPORT void fsc_init(frmScfCrc* p,unsigned char* pFrame);
+	DLL_EXPORT size_t fsc_peepHeader(FILE *stream,unsigned char* pFrame);
 	DLL_EXPORT const MP2_HEADER* fsc_header(frmScfCrc* p);
-	DLL_EXPORT int fsc_frameSize(frmScfCrc* p);
+	DLL_EXPORT int fsc_frameSize(const MP2_HEADER* pHeader);
 	DLL_EXPORT int fsc_applyScfCrc(frmScfCrc* p,unsigned char* pFrame);
+	DLL_EXPORT int fsc_getDabExt(int bit_rate,int num_channel);
 
 #ifdef __cplusplus
 }
