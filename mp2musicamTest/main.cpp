@@ -2,14 +2,6 @@
 #include <assert.h>
 #include "frmScfCrc.h"
 
-size_t peepHeader(FILE *stream,unsigned char* pFrame)
-{
-	size_t nRead = fread(pFrame,sizeof(unsigned char),4,stream);	//read header only
-	assert(nRead==4);
-	fseek(stream,-4,SEEK_CUR);	//reset location
-	return nRead;
-}
-
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -36,7 +28,7 @@ int main(int argc, char *argv[])
 	frmScfCrc* pFrmScfCrc = fsc_instance();
 
 	unsigned char frame[MAXBUF];
-	peepHeader(inpStream,frame);
+	fsc_peepHeader(inpStream,frame);
 	fsc_init(pFrmScfCrc,frame);
 
 	bool bLoop = true;
